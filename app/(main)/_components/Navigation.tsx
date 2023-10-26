@@ -15,14 +15,16 @@ import { useMediaQuery } from "usehooks-ts";
 
 import { cn } from "@/lib/utils";
 import UserItem from "./UserItem";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import Item from "./Item";
+import { toast } from "sonner";
 
 const Navigation = () => {
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
-
   const documents = useQuery(api.documents.get);
+  const create = useMutation(api.documents.create);
   const isResizingRef = useRef(false);
   const sidebarRef = useRef<ElementRef<"aside">>(null);
   const navbarRef = useRef<ElementRef<"div">>(null);
@@ -104,6 +106,15 @@ const Navigation = () => {
     }
   };
 
+  const handleCreate = () => {
+    const promise = create({ title: "Untitled" });
+    toast.promise(promise, {
+      loading: "creating a new Note...",
+      success: "New Note Created",
+      error: "Error creating a new Note.",
+    });
+  };
+
   return (
     <>
       <aside
@@ -126,6 +137,9 @@ const Navigation = () => {
         </div>
         <div>
           <UserItem />
+          <Item label="Search" icon={Search} onClick={() => {}} isSearch />
+          <Item label="Settings" icon={Settings} onClick={() => {}} />
+          <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
         </div>
         <div className="mt-4">
           {documents?.map((document: any) => (
