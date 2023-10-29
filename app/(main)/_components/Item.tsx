@@ -26,7 +26,7 @@ import { query } from "@/convex/_generated/server";
 
 interface ItemProps {
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
   icon: LucideIcon;
   id?: Id<"documents">;
   documentIcon?: string;

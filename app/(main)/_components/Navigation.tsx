@@ -20,6 +20,11 @@ import { api } from "@/convex/_generated/api";
 import Item from "./Item";
 import { toast } from "sonner";
 import { DocumentList } from "./DocumentList";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Navigation = () => {
   const pathname = usePathname();
@@ -116,8 +121,6 @@ const Navigation = () => {
     });
   };
 
-  
-
   return (
     <>
       <aside
@@ -146,6 +149,18 @@ const Navigation = () => {
         </div>
         <div className="mt-4">
           <DocumentList />
+          <Item label="Add a page" icon={Plus} onClick={handleCreate} />
+          <Popover>
+            <PopoverTrigger className="w-full mt-4">
+              <Item label="Trash" icon={Trash} />
+            </PopoverTrigger>
+            <PopoverContent
+              className="p-0 w72"
+              side={isMobile ? "bottom" : "right"}
+            >
+              trash Box
+            </PopoverContent>
+          </Popover>
         </div>
         <div
           onMouseDown={handleMouseDown}

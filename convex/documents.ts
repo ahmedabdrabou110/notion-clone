@@ -134,3 +134,23 @@ export const create = mutation({
     return documents;
   },
 });
+
+export const getTrash = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Not Authentication");
+    }
+    const userId = identity.subject;
+    const documents = await ctx.db
+      .query("documents")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => (q.field("isArchived"), true))
+      .order("desc")
+      .collect();
+
+    return documents;
+  },
+});
+
+
