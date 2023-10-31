@@ -4,6 +4,7 @@ import { useConvexAuth } from "convex/react";
 import { redirect } from "next/navigation";
 import Navigation from "./_components/Navigation";
 import { SearchCommand } from "@/components/SearchCommand";
+import SettingsProvider from "@/components/providers/settings-provider";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   const { isLoading, isAuthenticated } = useConvexAuth();
@@ -25,6 +26,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
       <Navigation />
       <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
         <SearchCommand />
+        <SettingsProvider />
         {children}
       </main>
     </div>
