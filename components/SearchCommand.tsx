@@ -29,9 +29,26 @@ export const SearchCommand = () => {
     setisMounted(true);
   }, []);
 
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.ctrlKey || e.metaKey)) {
+        e.stopPropagation();
+        toggle();
+      }
+    };
+
+    window.addEventListener("keydown", down);
+    return () => window.removeEventListener("keydown", down);
+  }, [toggle]);
+
   if (!isMounted) {
     return null;
   }
+
+  const onSelect = (id: string) => {
+    router.push(`/documents/${id}`);
+    onClose();
+  };
 
   return (
     <CommandDialog open={isOpen} onOpenChange={onClose}>
@@ -44,18 +61,14 @@ export const SearchCommand = () => {
               key={document._id}
               value={`${document._id}-${document.title}`}
               title={document.title}
-              onSelect={() => {}}
+              onSelect={onSelect}
             >
-             {document.icon ? (
-              <p className="mr-2 text-[18px]">
-                {document.icon}
-              </p>
-             ):(
-              <File className="mr-2 w-4 h-4" />
-             )}  
-             <span>
-              {document.title}
-             </span>
+              {document.icon ? (
+                <p className="mr-2 text-[18px]">{document.icon}</p>
+              ) : (
+                <File className="mr-2 w-4 h-4" />
+              )}
+              <span>{document.title}</span>
             </CommandItem>
           ))}
         </CommandGroup>
