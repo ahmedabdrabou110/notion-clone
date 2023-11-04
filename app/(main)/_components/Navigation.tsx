@@ -12,30 +12,33 @@ import {
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
-import UserItem from "./UserItem";
-import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import Item from "./Item";
-import { toast } from "sonner";
-import { DocumentList } from "./DocumentList";
 import {
   Popover,
-  PopoverContent,
   PopoverTrigger,
+  PopoverContent,
 } from "@/components/ui/popover";
-import { TrashBox } from "./TrashBox";
-import { useSearch } from "@/hooks/useSearch";
 import { useSettings } from "@/hooks/useSettings";
+import { useSearch } from "@/hooks/useSearch";
+import UserItem from "./UserItem";
+import Item from "./Item";
+import { DocumentList } from "./DocumentList";
+import { TrashBox } from "./TrashBox";
+import Navbar from "./Navbar";
 
 const Navigation = () => {
-  const search = useSearch();
+  const router = useRouter();
   const settings = useSettings();
+  const search = useSearch();
+  const params = useParams();
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
-  // const documents = useQuery(api.documents.get);
   const create = useMutation(api.documents.create);
+
   const isResizingRef = useRef(false);
   const sidebarRef = useRef<ElementRef<"aside">>(null);
   const navbarRef = useRef<ElementRef<"div">>(null);
@@ -118,11 +121,14 @@ const Navigation = () => {
   };
 
   const handleCreate = () => {
-    const promise = create({ title: "Untitled" });
+    const promise = create({ title: "Untitled" }).then((documentId) =>
+      router.push(`/documents/${documentId}`)
+    );
+
     toast.promise(promise, {
-      loading: "creating a new Note...",
-      success: "New Note Created",
-      error: "Error creating a new Note.",
+      loading: "Creating a new note...",
+      success: "New note created!",
+      error: "Failed to create a new note.",
     });
   };
 
@@ -131,7 +137,7 @@ const Navigation = () => {
       <aside
         ref={sidebarRef}
         className={cn(
-          "group/sidebar overflow-x-hidden h-full bg-secondary overflow-y-auto relative flex w-60 flex-col z-[99999]",
+          "group/sidebar h-full bg-secondary overflow-y-auto relative flex w-60 flex-col z-[99999]",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "w-0"
         )}
@@ -148,19 +154,19 @@ const Navigation = () => {
         </div>
         <div>
           <UserItem />
-          <Item label="Search" icon={Search} onClick={search.onOpen} isSearch />
+          <Item label="Search" icon={Search} isSearch onClick={search.onOpen} />
           <Item label="Settings" icon={Settings} onClick={settings.onOpen} />
           <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
         </div>
         <div className="mt-4">
           <DocumentList />
-          <Item label="Add a page" icon={Plus} onClick={handleCreate} />
+          <Item onClick={handleCreate} icon={Plus} label="Add a page" />
           <Popover>
             <PopoverTrigger className="w-full mt-4">
               <Item label="Trash" icon={Trash} />
             </PopoverTrigger>
             <PopoverContent
-              className="p-0 w72"
+              className="p-0 w-72"
               side={isMobile ? "bottom" : "right"}
             >
               <TrashBox />
@@ -181,15 +187,19 @@ const Navigation = () => {
           isMobile && "left-0 w-full"
         )}
       >
-        <nav className="bg-transparent px-3 py-2 w-full">
-          {isCollapsed && (
-            <MenuIcon
-              onClick={resetWidth}
-              role="button"
-              className="h-6 w-6 text-muted-foreground"
-            />
-          )}
-        </nav>
+        {!!params.documentId ? (
+          <Navbar isCollapsed={isCollapsed} onResetWidth={resetWidth} />
+        ) : (
+          <nav className="bg-transparent px-3 py-2 w-full">
+            {isCollapsed && (
+              <MenuIcon
+                onClick={resetWidth}
+                role="button"
+                className="h-6 w-6 text-muted-foreground"
+              />
+            )}
+          </nav>
+        )}
       </div>
     </>
   );
