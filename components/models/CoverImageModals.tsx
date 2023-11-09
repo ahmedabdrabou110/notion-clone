@@ -27,7 +27,9 @@ const CoverImageModals = () => {
       setIsSubmitting(true);
       setFile(file);
 
-      const res = await edgestore.publicFiles.upload({
+      let res;
+
+      res = await edgestore.publicFiles.upload({
         file,
       });
 
