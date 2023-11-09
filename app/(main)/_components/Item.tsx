@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@clerk/clerk-react";
 import { query } from "@/convex/_generated/server";
+import { useRouter } from "next/navigation";
 
 interface ItemProps {
   label: string;
@@ -48,6 +49,7 @@ const Item = ({
   onExpand,
   isSearch,
 }: ItemProps) => {
+  const router = useRouter();
   const { user } = useUser();
   const archieve = useMutation(api.documents.archive);
   const CheveronIcon = expanded ? ChevronDown : ChevronRight;
@@ -69,6 +71,7 @@ const Item = ({
         if (!expanded) {
           onExpand?.();
         }
+        router.push(`/documents/${documentId}`);
       }
     );
 
@@ -81,7 +84,7 @@ const Item = ({
   const onArchieve = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.stopPropagation();
     if (!id) return;
-    const promise = archieve({ id });
+    const promise = archieve({ id }).then(() => router.push("/documents"));
     toast.promise(promise, {
       loading: "Loading to move note to trash...",
       success: "Note Moved to trash",
