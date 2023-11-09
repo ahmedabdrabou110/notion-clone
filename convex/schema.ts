@@ -1,5 +1,6 @@
-import { defineTable, defineSchema } from "convex/server";
+import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+
 export default defineSchema({
   documents: defineTable({
     title: v.string(),
@@ -9,7 +10,7 @@ export default defineSchema({
     content: v.optional(v.string()),
     coverImage: v.optional(v.string()),
     icon: v.optional(v.string()),
-    isPublised: v.boolean(),
+    isPublished: v.boolean(),
   })
     .index("by_user", ["userId"])
     .index("by_user_parent", ["userId", "parentDocument"]),
