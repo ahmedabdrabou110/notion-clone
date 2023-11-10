@@ -1,20 +1,24 @@
-import { useCoverImage } from "@/hooks/useCoverImage";
+"use client";
+
 import { useState } from "react";
-import { Dialog, DialogHeader, DialogContent } from "../ui/dialog";
-import { useParams } from "next/navigation";
-import { useEdgeStore } from "@/lib/edgestore";
 import { useMutation } from "convex/react";
+import { useParams } from "next/navigation";
+
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { SingleImageDropzone } from "@/components/single-image-dropzone";
+import { useEdgeStore } from "@/lib/edgestore";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { SingleImageDropzone } from "../single-image-dropzone";
+import { useCoverImage } from "@/hooks/useCoverImage";
 
-const CoverImageModals = () => {
+export const CoverImageModal = () => {
   const params = useParams();
   const update = useMutation(api.documents.update);
-  const [file, setFile] = useState<File>();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const { edgestore } = useEdgeStore();
   const coverImage = useCoverImage();
+  const { edgestore } = useEdgeStore();
+
+  const [file, setFile] = useState<File>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onClose = () => {
     setIsSubmitting(false);
@@ -27,18 +31,19 @@ const CoverImageModals = () => {
       setIsSubmitting(true);
       setFile(file);
 
-      let res;
-
-      res = await edgestore.publicFiles.upload({
+      let res = await edgestore.publicFiles.upload({
         file,
+        options: {
+          replaceTargetUrl: coverImage.url,
+        },
       });
 
       await update({
         id: params.documentId as Id<"documents">,
         coverImage: res.url,
       });
+      onClose();
     }
-    onClose();
   };
 
   return (
@@ -46,16 +51,14 @@ const CoverImageModals = () => {
       <DialogContent>
         <DialogHeader>
           <h2 className="text-center text-lg font-semibold">Cover Image</h2>
-          <SingleImageDropzone
-            className="w-full outline-none"
-            disabled={isSubmitting}
-            onChange={onChange}
-            value={file}
-          />
         </DialogHeader>
+        <SingleImageDropzone
+          className="w-full outline-none"
+          disabled={isSubmitting}
+          value={file}
+          onChange={onChange}
+        />
       </DialogContent>
     </Dialog>
   );
 };
-
-export default CoverImageModals;

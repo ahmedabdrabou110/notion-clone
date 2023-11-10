@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Skeleton } from "@/components/ui/skeleton";
 import Cover from "@/components/Cover";
-import Toolbar from "@/components/Toolbar";
+import { Toolbar } from "@/components/Toolbar";
 
 interface DocumentIdPageProps {
   params: {

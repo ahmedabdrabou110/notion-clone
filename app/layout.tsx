@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { ConvexClientProvider } from "@/components/providers/convex-provider";
 import { Toaster } from "sonner";
 import { EdgeStoreProvider } from "@/lib/edgestore";
+import { ModalProvider } from "@/components/providers/settings-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,6 +39,7 @@ export default function RootLayout({
         <EdgeStoreProvider>
           <ConvexClientProvider>
             <Toaster />
+            <ModalProvider />
             <ThemeProvider
               attribute="class"
               defaultTheme="system"

@@ -1,25 +1,31 @@
-import { Doc } from "@/convex/_generated/dataModel";
-import React, { ElementRef, useRef, useState } from "react";
-import IconPicker from "./IconPicker";
-import { Button } from "./ui/button";
+"use client";
+
+import { ElementRef, useRef, useState } from "react";
 import { ImageIcon, Smile, X } from "lucide-react";
 import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 import TextareaAutosize from "react-textarea-autosize";
+
+import { Doc } from "@/convex/_generated/dataModel";
+import { Button } from "@/components/ui/button";
+import { api } from "@/convex/_generated/api";
 import { useCoverImage } from "@/hooks/useCoverImage";
+import IconPicker from "./IconPicker";
+
 interface ToolbarProps {
   initialData: Doc<"documents">;
   preview?: boolean;
 }
 
-const Toolbar = ({ initialData, preview }: ToolbarProps) => {
+export const Toolbar = ({ initialData, preview }: ToolbarProps) => {
   const inputRef = useRef<ElementRef<"textarea">>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(initialData.title);
 
   const update = useMutation(api.documents.update);
   const removeIcon = useMutation(api.documents.removeIcon);
+
   const coverImage = useCoverImage();
+
   const enableInput = () => {
     if (preview) return;
 
@@ -47,7 +53,7 @@ const Toolbar = ({ initialData, preview }: ToolbarProps) => {
     }
   };
 
-  const onSelectIcon = (icon: string) => {
+  const onIconSelect = (icon: string) => {
     update({
       id: initialData._id,
       icon,
@@ -60,11 +66,15 @@ const Toolbar = ({ initialData, preview }: ToolbarProps) => {
     });
   };
 
+  const openCoverImage = () => {
+    coverImage.onOpen();
+  };
+
   return (
     <div className="pl-[54px] group relative">
       {!!initialData.icon && !preview && (
         <div className="flex items-center gap-x-2 group/icon pt-6">
-          <IconPicker onChange={onSelectIcon}>
+          <IconPicker onChange={onIconSelect}>
             <p className="text-6xl hover:opacity-75 transition">
               {initialData.icon}
             </p>
@@ -84,7 +94,7 @@ const Toolbar = ({ initialData, preview }: ToolbarProps) => {
       )}
       <div className="opacity-0 group-hover:opacity-100 flex items-center gap-x-1 py-4">
         {!initialData.icon && !preview && (
-          <IconPicker asChild onChange={onSelectIcon}>
+          <IconPicker asChild onChange={onIconSelect}>
             <Button
               className="text-muted-foreground text-xs"
               variant="outline"
@@ -97,10 +107,10 @@ const Toolbar = ({ initialData, preview }: ToolbarProps) => {
         )}
         {!initialData.coverImage && !preview && (
           <Button
-            onClick={coverImage.onOpen}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"
+            onClick={openCoverImage}
           >
             <ImageIcon className="h-4 w-4 mr-2" />
             Add cover
@@ -127,5 +137,3 @@ const Toolbar = ({ initialData, preview }: ToolbarProps) => {
     </div>
   );
 };
-
-export default Toolbar;
